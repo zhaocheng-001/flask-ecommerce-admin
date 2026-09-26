@@ -1,0 +1,209 @@
+{
+	"info": {
+		"_postman_id": "b8f1a2c3-4d5e-6f70-8a9b-flaskshop0001",
+		"name": "Flask百战电商后台",
+		"description": "Flask 电商后台管理接口集合。使用前先调用「登录」接口建立 session（Postman 会自动保存 Cookie）。",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{ "key": "baseUrl", "value": "http://127.0.0.1:5000" }
+	],
+	"item": [
+		{
+			"name": "1-认证模块",
+			"item": [
+				{
+					"name": "登录（admin）",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "login"]
+						},
+						"description": "管理员登录，成功后 Postman 自动保存 session Cookie"
+					}
+				},
+				{
+					"name": "当前用户信息",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/me",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "me"]
+						}
+					}
+				},
+				{
+					"name": "登出",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "auth", "logout"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2-商品模块",
+			"item": [
+				{
+					"name": "商品列表（分页）",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/products?page=1&size=10&keyword=&category=",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "size", "value": "10" },
+								{ "key": "keyword", "value": "" },
+								{ "key": "category", "value": "" }
+							]
+						}
+					}
+				},
+				{
+					"name": "新增商品（管理员）",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"测试商品\",\n  \"category\": \"测试分类\",\n  \"price\": 99.9,\n  \"stock\": 100,\n  \"description\": \"Postman 测试新增的商品\",\n  \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/products",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products"]
+						}
+					}
+				},
+				{
+					"name": "热门商品（Redis缓存）",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/products/hot?top=5",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "hot"],
+							"query": [{ "key": "top", "value": "5" }]
+						},
+						"description": "连续请求两次，第二次 from_cache=true 即为命中 Redis 缓存"
+					}
+				},
+				{
+					"name": "商品详情",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "修改商品（管理员）",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"price\": 88.8,\n  \"stock\": 66\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "1"]
+						}
+					}
+				},
+				{
+					"name": "删除商品（管理员）",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{baseUrl}}/api/products/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "products", "1"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3-订单模块",
+			"item": [
+				{
+					"name": "创建订单",
+					"request": {
+						"method": "POST",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"items\": [\n    { \"product_id\": 1, \"quantity\": 2 },\n    { \"product_id\": 3, \"quantity\": 1 }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"]
+						}
+					}
+				},
+				{
+					"name": "我的订单列表",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/orders?page=1&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "size", "value": "10" }
+							]
+						}
+					}
+				},
+				{
+					"name": "订单详情",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/1",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "1"]
+						}
+					}
+				},
+				{
+					"name": "更新订单状态（管理员）",
+					"request": {
+						"method": "PUT",
+						"header": [{ "key": "Content-Type", "value": "application/json" }],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/orders/1/status",
+							"host": ["{{baseUrl}}"],
+							"path": ["api", "orders", "1", "status"]
+						}
+					}
+				}
+			]
+		}
+	]
+}
