@@ -46,6 +46,57 @@ flask-ecommerce-admin/
 └── .gitignore
 ```
 
+## 数据库设计（E-R 图）
+
+四张表、三组一对多关系（GitHub 会自动渲染下面的 Mermaid 图）：
+
+```mermaid
+erDiagram
+    USERS ||--o{ ORDERS : "1个用户下多笔订单"
+    ORDERS ||--|{ ORDER_ITEMS : "1笔订单含多条明细"
+    PRODUCTS ||--o{ ORDER_ITEMS : "1个商品出现在多条明细"
+    USERS {
+        int id PK
+        varchar username UK "唯一"
+        varchar password_hash "werkzeug加密"
+        varchar role "admin-user"
+        datetime created_at
+    }
+    PRODUCTS {
+        int id PK
+        varchar name
+        varchar category "有索引"
+        decimal price "DECIMAL 10,2"
+        int stock
+        int sales "热门排序 有索引"
+        text description
+        tinyint status "1上架 0下架"
+    }
+    ORDERS {
+        int id PK
+        varchar order_no UK "唯一"
+        int user_id FK
+        decimal total_amount
+        tinyint status "0待支付-4已取消"
+        datetime created_at
+    }
+    ORDER_ITEMS {
+        int id PK
+        int order_id FK
+        int product_id FK
+        varchar product_name "下单时快照"
+        decimal price "下单时快照"
+        int quantity
+    }
+```
+
+设计要点：
+
+- 明细表存下单时的商品名称/价格**快照**，商品改价不影响历史订单
+- `price` 用 `DECIMAL(10,2)` 避免浮点精度丢失
+- `sales`、`category` 建索引：热门商品排序、分类筛选高频使用
+- 完整建表语句见 `sql/init.sql`
+
 ## 快速开始
 
 ### 1. 准备环境
